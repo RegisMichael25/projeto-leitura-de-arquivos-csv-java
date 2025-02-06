@@ -1,210 +1,180 @@
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 
+
 public class ArquivoService {
-    static List<Alunos> listAlunos = new ArrayList<Alunos>();
-    public static void adicionandoItensAoArquivo(String livroOuAluno, File arquivo) {
+    public static void adicionandoItensAoArquivo(String livroOuAluno, File arquivo)
+    {
+        try(Scanner scanner = new Scanner(System.in))
+        {
+            FileWriter fr = new FileWriter(arquivo, true);
+            BufferedWriter escritor = new BufferedWriter(fr);
 
-        Scanner scanner = new Scanner(System.in);
-        Random random = new Random();
+            Random random = new Random();
 
-    int identificador = random.nextInt(1000) - 1;
-    String nome;
-        try {
-            FileWriter escritor = new FileWriter(arquivo, true);
-            escritor.write((identificador += 1) + ";");
+            int identificador = random.nextInt(1000);
 
             System.out.println("----------------------------------------");
             System.out.println("Informe o nome do " + livroOuAluno + ":");
+            String nome = scanner.nextLine();
 
-            nome = scanner.nextLine();
-            escritor.write(nome + "\n");
+            if (livroOuAluno.equals("aluno"))
+            {
+                escritor.write(identificador + ";" + nome + "\n");
+            }
 
-            escritor.flush();
-            escritor.close();
-
-            System.out.println(livroOuAluno + "adicionado com sucesso.");
+            if (livroOuAluno.equals("livro"))
+            {
+                escritor.write(identificador + ";" + nome + "\n");
+            }
+                escritor.flush();
             System.out.println("----------------------------------------");
 
-        } catch (Exception e) {
+        }
+            catch (Exception e)
+        {
 
-            System.out.println("----------------------------------------");
             System.out.println("Error ao ler o arquivo do: "+ livroOuAluno + ":" + e.getMessage());
-            System.out.println("----------------------------------------");
             e.printStackTrace();
 
         }
     }
 
-    public static  void leituraDoArquivo(File arquivo) {
+    private static String toString(int identificador)
+    {
+        String id = identificador + "";
+        return id;
+    }
 
-        try {
+    public static  void leituraDoArquivo(File arquivo, String livroOuAluno, List<Alunos> listaAlunos, List<Livros> listaLivros) {
 
-            InputStream is = new FileInputStream(arquivo);
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
+        try(BufferedReader br = (new BufferedReader(new InputStreamReader(new FileInputStream(arquivo), "UTF-8"))))
+        {
             String linha;
-
-
-            try {
-                while((linha = br.readLine()) != null) {
-
-                        System.out.println(Arrays.toString(linha.split(";")));
-
+                while((linha = br.readLine()) != null)
+                {
+                    if (livroOuAluno.equals("aluno"))
+                    {
+                        String[] item = linha.split(";");
+                        if(item[0].equals("ID") && item[1].equals("NOME"))
+                        {
+                            System.out.println("Lista de alunos: ");
+                        }
+                        else
+                        {
+                            Alunos a = new Alunos(item[0], item[1]);
+                            listaAlunos.add(a);
+                        }
                     }
 
-            } catch (Exception e) {
+                    if (livroOuAluno.equals("livro"))
+                    {
+                         String[] item = linha.split(";");
+                         if(item[0].equals("ID") && item[1].equals("NOME"))
+                         {
+                             System.out.println("Lista de livros:");
+                         }
+                         else
+                         {
+                            Livros l = new Livros(item[0], item[1]);
+                            listaLivros.add(l);
+                         }
 
-                System.out.println("Error: " + e.getMessage());
+                    }
+                }
 
-            }
-        } catch(Exception e) {
+                if(livroOuAluno.equals("aluno"))
+                {
+                    for (Alunos aluno : listaAlunos)
+                        {
+                            System.out.println(" Matricula: " + aluno.getMatriculaAluno() + "\n" + "Nome: " + aluno.getNomeAluno());
+                        }
 
-            System.out.println("----------------------------------------");
-            System.out.println("Ocorreu um erro na tentativa.");
-            System.out.println("----------------------------------------");
+                }
+
+                if(livroOuAluno.equals("livro"))
+                {
+                    for(Livros livro : listaLivros)
+                    {
+                        System.out.println("ID: " + livro.getId() + "\n" + "Nome: " + livro.getNomeLivro());
+                    }
+                }
+        }
+            catch(Exception e)
+        {
+            System.out.println("Ocorreu um erro na tentativa. " + e.getMessage());
             e.printStackTrace();
-
         }
 
     }
 
+    public static void removerItemDoArquivo(String arquivo, List<Alunos> alunos, List<Livros> livros)
+    {
+        try(BufferedReader br = (new BufferedReader(new InputStreamReader(new FileInputStream(arquivo), "UTF-8")));Scanner scanner = new Scanner(System.in))
+        {
+            String item;
 
-    public static void removerItemDoArquivo(String arquivo, List alunos) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Qual item deseja remover: ");
-        String item = scanner.nextLine();
-        if (arquivo == Alunos.getArquivoAluno().getName()) {
-            try{
-                for(Object aluno : alunos) {
-                    if(item.equalsIgnoreCase(String.valueOf(aluno))){
-                        alunos.remove(item);
+            if (arquivo.equals(Alunos.getArquivoAluno().getAbsolutePath()))
+            {
+                System.out.println("Que aluno deseja remover? ");
+                item = scanner.nextLine();
+
+                Iterator<Alunos> iterator = alunos.iterator();
+
+                boolean encontrado = false;
+
+                while(iterator.hasNext())
+                {
+                    Alunos aluno = iterator.next();
+
+                    if(aluno.getNomeAluno().equalsIgnoreCase(item))
+                    {
+                        iterator.remove();
+                        encontrado = true;
+                        System.out.println("Aluno removido com sucesso.");
+                        break;
                     }
                 }
 
-            } catch (Exception e) {
-                e.getMessage();
+                if(!encontrado)
+                {
+                    System.out.println("Aluno não encontrado.");
+                }
+            }
+            else if (arquivo.equals(Livros.getArquivoLivro().getName()))
+            {
+                System.out.println("Que livro deseja remover? ");
+                item = scanner.nextLine();
+                Iterator<Livros> iterator = livros.iterator();
+
+                boolean encontrado = false;
+
+                while(iterator.hasNext())
+                {
+                    Livros livro = iterator.next();
+
+                    if(livro.getNomeLivro().equalsIgnoreCase(item))
+                    {
+                        iterator.remove();
+                        encontrado = true;
+                        System.out.println("Livro removido com sucesso.");
+                        break;
+                    }
+                }
+
+                if(!encontrado)
+                {
+                    System.out.println("Livro não encontrado.");
+                }
+            }
+            else
+            {
+                System.out.println("Arquivo não encontrado.");
             }
         }
-
-    }
-
-    public static void carregarItensArquivo(File arquivo) {
-        List<String> listaTemporaria = new ArrayList<String>();
-        try {
-            InputStream is = new FileInputStream(arquivo);
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader br = new BufferedReader(isr);
-            String linha;
-                if(arquivo.equals(Alunos.getArquivoAluno())) {
-                    try {
-                        while((linha = br.readLine()) != null) {
-                                listaTemporaria.add(linha);
-                        }
-
-                        for (Alunos aluno:listaTemporaria ){
-
-                            Alunos alunoTemp = new Alunos();
-                            listAlunos.add(alunoTemp);
-                        }
-                        
-                        for (Alunos aluno:listAlunos) {
-                            System.out.println(aluno.getNomeAluno()+ "," + aluno.getMatriculaAluno());
-                        }
-
-                    } catch (Exception e) {
-                        System.out.println("Erro: " + e.getMessage());
-                    }
-                }
-        } catch (Exception e) {
-            System.out.println("Erro: " + e.getMessage());
-        }
-    }
-
-    // Inicio do programa executavel
-
-    public static void escolhaUsuario(String escolhaDoUsuario) {
-        Scanner scanner = new Scanner(System.in);
-        String escolhaDoUsuarioMenuAluno2;
-        switch (escolhaDoUsuario) {
-            case "1":
-                System.out.println("----------------------------------------");
-                System.out.println(
-                        "Menu Aluno\n" +
-                                "[1] - Adicionar Aluno\n" +
-                                "[2] - Editar Aluno\n" +
-                                "[3] - Remover Aluno\n" +
-                                "[4] - Mostrar Alunos"
-                );
-                System.out.println("----------------------------------------");
-                String strAluno = "aluno";
-                escolhaDoUsuarioMenuAluno2 = scanner.nextLine();
-                switch (escolhaDoUsuarioMenuAluno2) {
-                    case "1":
-                        try {
-                            adicionandoItensAoArquivo(strAluno,Alunos.getArquivoAluno());
-
-                            System.out.println("Aluno adicionado");
-
-                        break;
-                        } catch (Exception e) {
-
-                            e.getMessage();
-
-                        }
-                    case "2":
-
-                        System.out.println("Aluno editado!");
-
-                        break;
-                    case "3":
-                        System.out.println("Aluno removido!");
-                        break;
-                    case "4":
-                        Alunos.listarAlunos();
-                        break;
-                    default:
-                        System.out.println("Sem alterações...");
-                        break;
-                }
-            break;
-            case "2":
-
-                System.out.println(
-                        "Menu Livro\n" +
-                                "[1] - Adicionar Livro\n" +
-                                "[2] - Editar Livro\n" +
-                                "[3] - Remover Livro\n" +
-                                "[4] - Mostrar Livros"
-                );
-                String strLivro = "livro";
-                escolhaDoUsuarioMenuAluno2 = scanner.nextLine();
-                switch (escolhaDoUsuarioMenuAluno2) {
-                    case "1":
-                        try {
-
-                            adicionandoItensAoArquivo(strLivro,Livros.getArquivoLivro());
-                            System.out.println("Livro adicionado");
-                            break;
-                        } catch (Exception e) {
-                            e.getMessage();
-                        }
-                        break;
-                    case "2":
-                        System.out.println("Livro editado!");
-                        break;
-                    case "3":
-                        System.out.println("Livro removido!");
-                        break;
-                    case "4":
-                        System.out.println("Livros Cadastrados:");
-                        Livros.listarLivros();
-                        break;
-                    default:
-                        System.out.println("Sem alterações...");
-                        break;
-                }
+        catch (Exception e)
+        {
+            System.out.println("Erro ao remover item " + e.getMessage());
         }
     }
 

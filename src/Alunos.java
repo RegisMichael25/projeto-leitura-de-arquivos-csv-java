@@ -1,8 +1,9 @@
 import java.io.File;
 
 public class Alunos {
+    static String strAluno = "aluno";
     private String nomeAluno;
-    private int matriculaAluno;
+    private String matriculaAluno;
     private static final String ARQUIVOALUNO = "arquivoaluno.csv";
     private static final String CAMINHOALUNO =
             "C:" + File.separator +
@@ -16,7 +17,7 @@ public class Alunos {
 
     static File arquivoAluno = new File(CAMINHOALUNO);
 
-    public Alunos(String nomeAluno, int matriculaAluno) {
+    public Alunos(String matriculaAluno, String nomeAluno) {
         this.nomeAluno = nomeAluno;
         this.matriculaAluno = matriculaAluno;
     }
@@ -29,11 +30,11 @@ public class Alunos {
         this.nomeAluno = nomeAluno;
     }
 
-    public int getMatriculaAluno() {
+    public String getMatriculaAluno() {
         return matriculaAluno;
     }
 
-    public void setMatriculaAluno(int matriculaAluno) {
+    public void setMatriculaAluno(String matriculaAluno) {
         this.matriculaAluno = matriculaAluno;
     }
 
@@ -46,7 +47,7 @@ public class Alunos {
     }
 
     public static void listarAlunos() {
-        ArquivoService.leituraDoArquivo(arquivoAluno);
+        ArquivoService.leituraDoArquivo(arquivoAluno, strAluno, ExecucaoCodigo.listAlunos, ExecucaoCodigo.listLivros);
     }
 
     public static void editarAluno() {
@@ -57,6 +58,6 @@ public class Alunos {
     public String toString() {
         return "Alunos:\n" +
                 "Aluno: " + nomeAluno +
-                "matriculaAluno=" + matriculaAluno;
+                "Matricula: " + matriculaAluno;
     }
 }

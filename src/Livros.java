@@ -1,8 +1,9 @@
 import java.io.File;
 
 public class Livros {
+    public static String strLivro = "livro";
     private String nomeLivro;
-    private int id;
+    private String id;
     private static final String ARQUIVOLIVRO = "arquivolivro.csv";
     private static final String CAMINHOLIVRO =
             "C:" + File.separator +
@@ -16,7 +17,7 @@ public class Livros {
 
     static File arquivoLivro = new File(CAMINHOLIVRO);
 
-    public Livros(String nomeLivro, int id) {
+    public Livros(String id, String nomeLivro) {
         this.nomeLivro = nomeLivro;
         this.id = id;
     }
@@ -33,11 +34,11 @@ public class Livros {
         this.nomeLivro = nomeLivro;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -47,6 +48,6 @@ public class Livros {
 
 
     public static void listarLivros() {
-        ArquivoService.leituraDoArquivo(arquivoLivro);
+        ArquivoService.leituraDoArquivo(arquivoLivro, strLivro, ExecucaoCodigo.listAlunos, ExecucaoCodigo.listLivros);
     }
 }
