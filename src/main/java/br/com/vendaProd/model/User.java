@@ -1,3 +1,4 @@
+package main.java.br.com.vendaProd.model;
 public class User {
     private String nameUser;
     private boolean admin;
@@ -25,7 +26,7 @@ public class User {
         this.admin = admin;
     }
 
-    public String getpassword() {
+    public String getPassword() {
         return password;
     }
 
